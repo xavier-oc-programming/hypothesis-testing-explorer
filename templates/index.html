@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hypothesis Testing Explorer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo: #4338CA;
+      --indigo-light: #6366f1;
+      --indigo-bg: #eef2ff;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fee2e2;
+      --amber: #d97706;
+      --amber-bg: #fef3c7;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 24px 0;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--indigo);
+      letter-spacing: -0.5px;
+    }
+    header p.subtitle {
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 10px;
+      background: var(--indigo-bg);
+      color: var(--indigo);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid #c7d2fe;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .tab-btn {
+      padding: 8px 18px;
+      border: 1px solid var(--gray-200);
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-700);
+      transition: all 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--indigo);
+      color: white;
+      border-color: var(--indigo);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Form elements ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+    input[type="text"], input[type="number"], select, input[type="file"] {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--gray-900);
+      background: white;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: var(--indigo-light); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+    input[type="file"] { cursor: pointer; }
+
+    .group-block {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .group-block h3 { font-size: 13px; font-weight: 600; color: var(--indigo); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Example buttons */
+    .example-grid { display: flex; flex-direction: column; gap: 10px; }
+    .example-btn {
+      padding: 14px 18px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+    }
+    .example-btn:hover { border-color: var(--indigo); background: var(--indigo-bg); }
+    .example-btn .ex-title { font-weight: 600; font-size: 14px; color: var(--gray-900); }
+    .example-btn .ex-desc { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+
+    /* Test selector */
+    .test-config { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; margin-top: 16px; }
+    .alpha-group label { display: flex; align-items: center; justify-content: space-between; }
+    .alpha-group input[type="range"] { width: 100%; margin-top: 6px; accent-color: var(--indigo); }
+    .alpha-val { font-weight: 700; color: var(--indigo); }
+
+    /* Run button */
+    .run-btn {
+      padding: 12px 32px;
+      background: var(--indigo);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .run-btn:hover { background: #3730a3; }
+    .run-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    /* ── Verdict banner ── */
+    #verdict-banner {
+      display: none;
+      padding: 22px 24px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    #verdict-banner.significant { background: var(--green-bg); border: 1.5px solid #86efac; }
+    #verdict-banner.not-significant { background: var(--red-bg); border: 1.5px solid #fca5a5; }
+    .verdict-emoji { font-size: 22px; margin-right: 8px; }
+    .verdict-main { font-size: 18px; font-weight: 700; }
+    .verdict-main.sig-text { color: var(--green); }
+    .verdict-main.not-sig-text { color: var(--red); }
+    .verdict-pval { font-size: 26px; font-weight: 800; margin-top: 6px; }
+    .verdict-pval.sig-text { color: var(--green); }
+    .verdict-pval.not-sig-text { color: var(--red); }
+
+    /* ── Results grid ── */
+    #results-section { display: none; animation: fadeIn 0.3s ease; }
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+    .result-card { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+    .result-card h3 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-bottom: 14px; }
+
+    .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--gray-500); }
+    .stat-val { font-weight: 600; color: var(--gray-900); }
+
+    .engine-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .engine-scipy { background: #dbeafe; color: #1d4ed8; }
+    .engine-spark { background: #fef3c7; color: #92400e; }
+
+    .assumption-item { padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
+    .assumption-item:last-child { border-bottom: none; }
+    .assumption-label { font-weight: 600; color: var(--gray-700); margin-bottom: 2px; }
+    .assumption-detail { color: var(--gray-500); font-size: 12px; }
+    .pass { color: var(--green); }
+    .fail { color: var(--red); }
+
+    .warning-box {
+      background: var(--amber-bg);
+      border: 1px solid #fcd34d;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #78350f;
+      margin-top: 10px;
+    }
+    .warning-box strong { display: block; margin-bottom: 3px; }
+
+    .interpretation-text { font-size: 14px; color: var(--gray-700); line-height: 1.7; }
+
+    .group-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .group-stat-col h4 { font-size: 12px; font-weight: 700; color: var(--indigo); text-transform: uppercase; margin-bottom: 8px; }
+    .group-stat-item { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px solid var(--gray-100); }
+    .group-stat-item:last-child { border-bottom: none; }
+
+    /* Plot */
+    #plot-section { display: none; margin-bottom: 32px; }
+    #plot-section img { width: 100%; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow-md); }
+
+    /* Spinner */
+    .spinner { display: none; width: 20px; height: 20px; border: 3px solid #c7d2fe; border-top-color: var(--indigo); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-box { background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; padding: 14px 18px; color: #991b1b; font-size: 14px; margin-top: 12px; display: none; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 640px) {
+      .form-row { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: 1fr; }
+      .group-stats-grid { grid-template-columns: 1fr; }
+      .test-config { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Hypothesis Testing Explorer</h1>
+    <p class="subtitle">Upload data, select a test, get a plain-English answer</p>
+    <span class="badge">Large datasets (50,000+ rows) automatically use PySpark</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Input card -->
+  <div class="card">
+    <h2>Input Data</h2>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('upload')">Upload CSV files</button>
+      <button class="tab-btn" onclick="switchTab('example')">Use example data</button>
+    </div>
+
+    <!-- Upload tab -->
+    <div id="tab-upload" class="tab-panel active">
+      <div class="form-row">
+        <div class="group-block">
+          <h3>Group 1</h3>
+          <label>CSV file
+            <input type="file" id="file1" accept=".csv" onchange="previewColumns('file1','col1')" />
+          </label>
+          <br/>
+          <label>Column
+            <select id="col1"><option value="">— upload file first —</option></select>
+          </label>
+          <br/>
+          <label>Group label
+            <input type="text" id="label1" value="Group 1" />
+          </label>
+        </div>
+
+        <div class="group-block">
+          <h3>Group 2</h3>
+          <label>CSV file
+            <input type="file" id="file2" accept=".csv" onchange="previewColumns('file2','col2')" />
+          </label>
+          <br/>
+          <label>Column
+            <select id="col2"><option value="">— upload file first —</option></select>
+          </label>
+          <br/>
+          <label>Group label
+            <input type="text" id="label2" value="Group 2" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example tab -->
+    <div id="tab-example" class="tab-panel">
+      <div class="example-grid">
+        <button class="example-btn" onclick="runExample('exam_scores')">
+          <div class="ex-title">Exam scores (Method A vs B)</div>
+          <div class="ex-desc">Independent t-test · 80 students per group · continuous data</div>
+        </button>
+        <button class="example-btn" onclick="runExample('sales_by_region')">
+          <div class="ex-title">Sales by region (North vs South)</div>
+          <div class="ex-desc">Welch's t-test · 60 months per region · unequal variances</div>
+        </button>
+        <button class="example-btn" onclick="runExample('treatment_effect')">
+          <div class="ex-title">Blood pressure (before vs after — paired)</div>
+          <div class="ex-desc">Paired t-test · 50 patients · same subjects measured twice</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Test selection -->
+    <div class="test-config">
+      <div>
+        <label for="test-select">Statistical test</label>
+        <select id="test-select">
+          <option value="independent_ttest">Independent t-test</option>
+          <option value="welch_ttest">Welch's t-test</option>
+          <option value="paired_ttest">Paired t-test</option>
+          <option value="mannwhitney">Mann-Whitney U</option>
+          <option value="chisquare">Chi-square test</option>
+        </select>
+      </div>
+      <div class="alpha-group" style="min-width:160px">
+        <label>
+          Significance level α
+          <span class="alpha-val" id="alpha-display">0.05</span>
+        </label>
+        <input type="range" id="alpha-range" min="0.01" max="0.10" step="0.01" value="0.05"
+               oninput="document.getElementById('alpha-display').textContent=parseFloat(this.value).toFixed(2)" />
+      </div>
+      <div>
+        <button class="run-btn" id="run-btn" onclick="runTest()">Run Test</button>
+      </div>
+    </div>
+
+    <div class="spinner" id="spinner" style="margin-top:16px"></div>
+    <div class="error-box" id="error-box"></div>
+  </div>
+
+  <!-- Verdict banner -->
+  <div id="verdict-banner">
+    <div>
+      <span class="verdict-emoji" id="verdict-emoji"></span>
+      <span class="verdict-main" id="verdict-text"></span>
+    </div>
+    <div class="verdict-pval" id="verdict-pval"></div>
+  </div>
+
+  <!-- Results section -->
+  <div id="results-section">
+    <div class="results-grid">
+
+      <!-- Card 1: Test details -->
+      <div class="result-card">
+        <h3>Test Details</h3>
+        <div id="test-details-content"></div>
+      </div>
+
+      <!-- Card 2: Assumption checks -->
+      <div class="result-card">
+        <h3>Assumption Checks</h3>
+        <div id="assumption-content"></div>
+      </div>
+
+      <!-- Card 3: Interpretation -->
+      <div class="result-card">
+        <h3>Plain-English Interpretation</h3>
+        <p class="interpretation-text" id="interpretation-text"></p>
+      </div>
+
+      <!-- Card 4: Group statistics -->
+      <div class="result-card">
+        <h3>Group Statistics</h3>
+        <div id="group-stats-content"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Plot -->
+  <div id="plot-section">
+    <div class="card" style="padding:16px">
+      <h2>Distribution Plot</h2>
+      <img id="plot-img" src="" alt="Distribution plot" />
+    </div>
+  </div>
+
+</main>
+
+<script>
+  let exampleData = null;
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  async function previewColumns(fileInputId, selectId) {
+    const file = document.getElementById(fileInputId).files[0];
+    if (!file) return;
+    const text = await file.text();
+    const header = text.split('\n')[0].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+    const sel = document.getElementById(selectId);
+    sel.innerHTML = header.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
+
+  async function loadExampleData() {
+    if (exampleData) return exampleData;
+    const r = await fetch('/api/example-data');
+    exampleData = await r.json();
+    return exampleData;
+  }
+
+  async function runExample(key) {
+    const data = await loadExampleData();
+    const ex = data[key];
+    document.getElementById('test-select').value = ex.test_name;
+    document.getElementById('label1').value = ex.group1_name;
+    document.getElementById('label2').value = ex.group2_name;
+    await runTestWithData(ex.group1, ex.group2, ex.test_name, ex.group1_name, ex.group2_name);
+  }
+
+  async function runTest() {
+    const activeTab = document.querySelector('.tab-panel.active').id;
+
+    if (activeTab === 'tab-upload') {
+      const f1 = document.getElementById('file1').files[0];
+      const f2 = document.getElementById('file2').files[0];
+      if (!f1 || !f2) { showError('Please upload both CSV files.'); return; }
+
+      const testName = document.getElementById('test-select').value;
+      const alpha = parseFloat(document.getElementById('alpha-range').value);
+      const g1name = document.getElementById('label1').value || 'Group 1';
+      const g2name = document.getElementById('label2').value || 'Group 2';
+      const col1 = document.getElementById('col1').value;
+      const col2 = document.getElementById('col2').value;
+
+      setLoading(true);
+      hideError();
+
+      const fd = new FormData();
+      fd.append('group1_file', f1);
+      fd.append('group2_file', f2);
+      fd.append('test_name', testName);
+      fd.append('alpha', alpha);
+      fd.append('group1_name', g1name);
+      fd.append('group2_name', g2name);
+      if (col1) fd.append('col1', col1);
+      if (col2) fd.append('col2', col2);
+
+      try {
+        const resp = await fetch('/test/upload', { method: 'POST', body: fd });
+        const data = await resp.json();
+        if (!resp.ok) { showError(data.detail || 'An error occurred.'); return; }
+        renderResults(data, g1name, g2name);
+      } catch (e) { showError('Network error: ' + e.message); }
+      finally { setLoading(false); }
+
+    } else {
+      showError('Select an example dataset above, or switch to "Upload CSV files".');
+    }
+  }
+
+  async function runTestWithData(group1, group2, testName, g1name, g2name) {
+    const alpha = parseFloat(document.getElementById('alpha-range').value);
+    setLoading(true);
+    hideError();
+
+    try {
+      const resp = await fetch('/test/text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ group1, group2, test_name: testName, alpha, group1_name: g1name, group2_name: g2name })
+      });
+      const data = await resp.json();
+      if (!resp.ok) { showError(data.detail || 'An error occurred.'); return; }
+      renderResults(data, g1name, g2name);
+    } catch (e) { showError('Network error: ' + e.message); }
+    finally { setLoading(false); }
+  }
+
+  function renderResults(d, g1name, g2name) {
+    // Verdict banner
+    const banner = document.getElementById('verdict-banner');
+    const verdictText = document.getElementById('verdict-text');
+    const verdictPval = document.getElementById('verdict-pval');
+    const verdictEmoji = document.getElementById('verdict-emoji');
+
+    banner.style.display = 'block';
+    if (d.significant) {
+      banner.className = 'significant';
+      verdictEmoji.textContent = '✓';
+      verdictText.textContent = 'There IS a statistically significant difference';
+      verdictText.className = 'verdict-main sig-text';
+      verdictPval.textContent = `p = ${d.p_value.toFixed(4)}`;
+      verdictPval.className = 'verdict-pval sig-text';
+    } else {
+      banner.className = 'not-significant';
+      verdictEmoji.textContent = '✗';
+      verdictText.textContent = 'There IS NOT a statistically significant difference';
+      verdictText.className = 'verdict-main not-sig-text';
+      verdictPval.textContent = `p = ${d.p_value.toFixed(4)}`;
+      verdictPval.className = 'verdict-pval not-sig-text';
+    }
+
+    // Card 1: Test details
+    const engineClass = d.engine.includes('PySpark') ? 'engine-spark' : 'engine-scipy';
+    let detailRows = `
+      <div class="stat-row"><span class="stat-label">Test</span><span class="stat-val">${d.test_name.replace(/_/g,' ')}</span></div>
+      <div class="stat-row"><span class="stat-label">Statistic</span><span class="stat-val">${d.statistic.toFixed(4)}</span></div>
+      <div class="stat-row"><span class="stat-label">p-value</span><span class="stat-val">${d.p_value.toFixed(4)}</span></div>
+      <div class="stat-row"><span class="stat-label">Alpha (α)</span><span class="stat-val">${d.alpha}</span></div>
+      <div class="stat-row"><span class="stat-label">Engine</span><span class="stat-val"><span class="engine-badge ${engineClass}">${d.engine}</span></span></div>
+    `;
+    if (d.total_rows) {
+      detailRows += `<div class="stat-row"><span class="stat-label">Total rows</span><span class="stat-val">${d.total_rows.toLocaleString()}</span></div>`;
+      detailRows += `<div class="stat-row"><span class="stat-label">Sampled for test</span><span class="stat-val">${d.sampled_for_test.toLocaleString()}</span></div>`;
+    }
+    document.getElementById('test-details-content').innerHTML = detailRows;
+
+    // Card 2: Assumption checks
+    let assumptionHtml = '';
+    const checks = d.assumption_checks || {};
+    if (Object.keys(checks).length === 0) {
+      assumptionHtml = '<p style="color:var(--gray-500);font-size:13px">No assumption checks for this test.</p>';
+    } else {
+      for (const [key, val] of Object.entries(checks)) {
+        const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        let passedClass = '';
+        let passedText = '';
+        if ('is_normal' in val) {
+          passedClass = val.is_normal ? 'pass' : 'fail';
+          passedText = val.is_normal ? 'Normal' : 'Not normal';
+        } else if ('equal_variance' in val) {
+          passedClass = val.equal_variance ? 'pass' : 'fail';
+          passedText = val.equal_variance ? 'Equal' : 'Unequal';
+        }
+        assumptionHtml += `
+          <div class="assumption-item">
+            <div class="assumption-label">${label}: <span class="${passedClass}">${passedText}</span></div>
+            <div class="assumption-detail">${val.interpretation || ''}</div>
+          </div>`;
+      }
+    }
+    if (d.recommendation) {
+      assumptionHtml += `<div class="warning-box"><strong>Recommendation</strong>${d.recommendation}</div>`;
+    }
+    document.getElementById('assumption-content').innerHTML = assumptionHtml;
+
+    // Card 3: Interpretation
+    document.getElementById('interpretation-text').textContent = d.interpretation;
+
+    // Card 4: Group statistics
+    let sparkStats = d.spark_stats;
+    let statsHtml = '<div class="group-stats-grid">';
+
+    function colStats(name, n, sparkData) {
+      let html = `<div class="group-stat-col"><h4>${name}</h4>`;
+      html += `<div class="group-stat-item"><span>n</span><span>${n != null ? n.toLocaleString() : '—'}</span></div>`;
+      if (sparkData) {
+        html += `<div class="group-stat-item"><span>Mean</span><span>${sparkData.mean != null ? sparkData.mean.toFixed(3) : '—'}</span></div>`;
+        html += `<div class="group-stat-item"><span>Std dev</span><span>${sparkData.std != null ? sparkData.std.toFixed(3) : '—'}</span></div>`;
+        html += `<div class="group-stat-item"><span>Min</span><span>${sparkData.min != null ? sparkData.min.toFixed(3) : '—'}</span></div>`;
+        html += `<div class="group-stat-item"><span>Max</span><span>${sparkData.max != null ? sparkData.max.toFixed(3) : '—'}</span></div>`;
+      }
+      html += '</div>';
+      return html;
+    }
+
+    statsHtml += colStats(g1name || 'Group 1', d.n_group1, sparkStats ? sparkStats.group1 : null);
+    if (d.n_group2 != null) {
+      statsHtml += colStats(g2name || 'Group 2', d.n_group2, sparkStats ? sparkStats.group2 : null);
+    }
+    statsHtml += '</div>';
+    document.getElementById('group-stats-content').innerHTML = statsHtml;
+
+    // Show results
+    document.getElementById('results-section').style.display = 'block';
+
+    // Plot
+    if (d.plot_url) {
+      document.getElementById('plot-img').src = d.plot_url + '?t=' + Date.now();
+      document.getElementById('plot-section').style.display = 'block';
+    }
+
+    window.scrollTo({ top: document.getElementById('verdict-banner').offsetTop - 20, behavior: 'smooth' });
+  }
+
+  function setLoading(on) {
+    document.getElementById('spinner').style.display = on ? 'block' : 'none';
+    document.getElementById('run-btn').disabled = on;
+    document.getElementById('run-btn').textContent = on ? 'Running…' : 'Run Test';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-box');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('error-box').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
