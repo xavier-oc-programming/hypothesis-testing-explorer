@@ -365,13 +365,16 @@
           <option value="chisquare">Chi-square test</option>
         </select>
       </div>
-      <div class="alpha-group" style="min-width:160px">
+      <div class="alpha-group" style="min-width:180px">
         <label>
           Significance level α
           <span class="alpha-val" id="alpha-display">0.05</span>
         </label>
         <input type="range" id="alpha-range" min="0.01" max="0.10" step="0.01" value="0.05"
-               oninput="document.getElementById('alpha-display').textContent=parseFloat(this.value).toFixed(2)" />
+               oninput="updateAlphaLabel(parseFloat(this.value))" />
+        <p id="alpha-hint" style="font-size:11px;color:var(--gray-500);margin-top:5px;line-height:1.4">
+          The p-value must be below <strong>0.05</strong> for the result to be called significant. Lower α = stricter test, fewer false positives.
+        </p>
       </div>
       <div>
         <button class="run-btn" id="run-btn" onclick="runTest()">Run Test</button>
@@ -573,6 +576,16 @@
 </main>
 
 <script>
+  function updateAlphaLabel(val) {
+    document.getElementById('alpha-display').textContent = val.toFixed(2);
+    const pct = Math.round(val * 100);
+    document.getElementById('alpha-hint').innerHTML =
+      `The p-value must be below <strong>${val.toFixed(2)}</strong> for the result to be called significant — a ${pct}% false-positive rate. `
+      + (val <= 0.01 ? 'Very strict: fewer false positives, but easier to miss real effects.'
+       : val >= 0.09 ? 'Lenient: catches more effects, but higher risk of false positives.'
+       : 'Standard threshold used in most fields.');
+  }
+
   function toggleGlossary() {
     const body = document.getElementById('glossary-body');
     const arrow = document.getElementById('glossary-arrow');
