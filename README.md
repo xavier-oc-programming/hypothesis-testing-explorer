@@ -6,7 +6,7 @@ colorTo: purple
 sdk: docker
 app_port: 7860
 pinned: false
-short_description: Statistical tests with plain-English verdicts + PySpark routing
+short_description: Hypothesis tests with plain-English verdicts + PySpark
 ---
 
 # hypothesis-testing-explorer
