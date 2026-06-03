@@ -257,6 +257,11 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+    .gloss-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+    .gloss-item:last-child { border-bottom: none; }
+    .gloss-term { display: block; font-weight: 600; font-size: 14px; color: var(--gray-900); margin-bottom: 3px; }
+    .gloss-def { display: block; font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+
     @media (max-width: 640px) {
       .form-row { grid-template-columns: 1fr; }
       .results-grid { grid-template-columns: 1fr; }
@@ -416,9 +421,77 @@
     </div>
   </div>
 
+  <!-- Glossary -->
+  <div class="card" style="margin-bottom:32px">
+    <button onclick="toggleGlossary()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
+      <h2 style="margin:0;border:none;padding:0">Statistical Terms — Plain English</h2>
+      <span id="glossary-arrow" style="font-size:18px;color:var(--gray-500)">▼</span>
+    </button>
+    <div id="glossary-body" style="display:none;margin-top:20px">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <div>
+          <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);margin-bottom:12px">Results</p>
+
+          <div class="gloss-item">
+            <span class="gloss-term">p-value</span>
+            <span class="gloss-def">The probability of seeing a difference this large if there were truly no difference. Below 0.05 → the result is called statistically significant. The lower it is, the stronger the evidence.</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">α (alpha)</span>
+            <span class="gloss-def">Your significance threshold — the cut-off you set before running the test. Default is 0.05, meaning you accept a 5% chance of a false positive. If p &lt; α, the result is significant.</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">Test statistic</span>
+            <span class="gloss-def">A single number summarising how different the two groups are, relative to the natural variation in the data. The further it is from zero, the more different the groups. The p-value is calculated from this number.</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">n</span>
+            <span class="gloss-def">The number of observations (rows) in that group. Larger n gives the test more power to detect real differences.</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">Engine</span>
+            <span class="gloss-def">Which tool ran the computation. <strong>pandas/scipy</strong> is used for datasets under 50,000 rows. <strong>PySpark + scipy</strong> is used above that — PySpark prepares the data at scale, scipy computes the test statistic.</span>
+          </div>
+        </div>
+
+        <div>
+          <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);margin-bottom:12px">Assumption Checks</p>
+
+          <div class="gloss-item">
+            <span class="gloss-term">Normality (Shapiro-Wilk)</span>
+            <span class="gloss-def">Tests whether the data follows a bell-curve shape. Parametric tests (t-tests) assume this. <strong>W</strong> is the test statistic — close to 1.0 means the data looks normal. The p-value here works in reverse: <em>high p = normal</em>, low p = not normal.</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">Equal variance (Levene's)</span>
+            <span class="gloss-def">Tests whether both groups have a similar spread of values. The standard independent t-test assumes they do. <strong>W</strong> here measures the difference in spread. Again, <em>high p = equal variance</em> (assumption holds), low p = unequal (use Welch's t-test instead).</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">Assumption check p-values</span>
+            <span class="gloss-def">These work the <em>opposite</em> way to the main test p-value. For the main test, low p = significant result. For assumption checks, low p = the assumption is <strong>violated</strong>. You want these to be high (above 0.05).</span>
+          </div>
+          <div class="gloss-item">
+            <span class="gloss-term">Recommendation</span>
+            <span class="gloss-def">If an assumption is violated, the app suggests a more appropriate test. For example, non-normal data → Mann-Whitney U. Unequal variances → Welch's t-test.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
+  function toggleGlossary() {
+    const body = document.getElementById('glossary-body');
+    const arrow = document.getElementById('glossary-arrow');
+    const open = body.style.display === 'block';
+    body.style.display = open ? 'none' : 'block';
+    arrow.textContent = open ? '▼' : '▲';
+  }
+
   let exampleData = null;
 
   function switchTab(tab) {
