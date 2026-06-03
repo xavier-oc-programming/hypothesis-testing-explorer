@@ -257,6 +257,7 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+    .gloss-subcat { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--indigo); margin-bottom: 12px; padding: 4px 10px; background: var(--indigo-bg); border-radius: 4px; display: inline-block; }
     .gloss-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
     .gloss-item:last-child { border-bottom: none; }
     .gloss-term { display: block; font-weight: 600; font-size: 14px; color: var(--gray-900); margin-bottom: 3px; }
@@ -430,8 +431,11 @@
     <div id="glossary-body" style="display:none;margin-top:20px">
 
       <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--gray-200)">
-        <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);margin-bottom:12px">The Basics</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);margin-bottom:16px">The Basics</p>
+
+        <!-- Core concepts -->
+        <p class="gloss-subcat">Core concepts</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
           <div class="gloss-item" style="border:none;padding:0">
             <span class="gloss-term">Hypothesis testing</span>
             <span class="gloss-def">A method for deciding whether a pattern in your data is real or just random chance. You collect two groups of measurements and ask: are these actually different, or could the gap be noise?</span>
@@ -445,6 +449,10 @@
             <span class="gloss-def">A result is "statistically significant" when the p-value falls below your threshold (α). It means the result is unlikely to be a fluke — not that the difference is large or practically important.</span>
           </div>
           <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Statistical power</span>
+            <span class="gloss-def">The test's ability to detect a real difference when one exists. More data = more power. A test with low power might miss a real effect and incorrectly report no significant difference.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
             <span class="gloss-term">Parametric vs non-parametric</span>
             <span class="gloss-def">Parametric tests (t-tests) assume your data follows a normal distribution. Non-parametric tests (Mann-Whitney) make no such assumption — they work by ranking the data instead.</span>
           </div>
@@ -452,38 +460,44 @@
             <span class="gloss-term">Normal distribution</span>
             <span class="gloss-def">The classic bell curve — most values cluster around the middle, fewer at the extremes. Many natural measurements follow this shape. Required for t-tests to be reliable.</span>
           </div>
-          <div class="gloss-item" style="border:none;padding:0">
-            <span class="gloss-term">Statistical power</span>
-            <span class="gloss-def">The test's ability to detect a real difference when one exists. More data = more power. A test with low power might miss a real effect and incorrectly report no significant difference.</span>
-          </div>
+        </div>
+
+        <!-- Describing your data -->
+        <p class="gloss-subcat">Describing your data</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
           <div class="gloss-item" style="border:none;padding:0">
             <span class="gloss-term">Mean</span>
             <span class="gloss-def">The average. Add all values and divide by how many there are. The t-tests in this app compare the means of two groups.</span>
-          </div>
-          <div class="gloss-item" style="border:none;padding:0">
-            <span class="gloss-term">Variance</span>
-            <span class="gloss-def">How spread out the values are around the mean. High variance = values are scattered widely. Low variance = values cluster tightly. Two groups can have the same mean but very different variances.</span>
-          </div>
-          <div class="gloss-item" style="border:none;padding:0">
-            <span class="gloss-term">Standard deviation (std)</span>
-            <span class="gloss-def">The square root of the variance — a more intuitive measure of spread, in the same units as the data. About 68% of values in a normal distribution fall within one standard deviation of the mean.</span>
           </div>
           <div class="gloss-item" style="border:none;padding:0">
             <span class="gloss-term">Median</span>
             <span class="gloss-def">The middle value when all values are sorted. Unlike the mean, it is not pulled by extreme outliers. The box in a box plot shows the median as a line in the middle.</span>
           </div>
           <div class="gloss-item" style="border:none;padding:0">
-            <span class="gloss-term">IQR (interquartile range)</span>
-            <span class="gloss-def">The range of the middle 50% of values — from the 25th to the 75th percentile. Shown as the height of the box in a box plot. A wide box means high spread in the middle of the data.</span>
+            <span class="gloss-term">Variance</span>
+            <span class="gloss-def">How spread out the values are around the mean. High variance = values scattered widely. Low variance = values cluster tightly. Two groups can have the same mean but very different variances.</span>
           </div>
           <div class="gloss-item" style="border:none;padding:0">
-            <span class="gloss-term">Outlier</span>
-            <span class="gloss-def">A value far from the rest of the data. Shown as individual dots beyond the whiskers in a box plot. Outliers can distort means and inflate variance — one reason to check normality before running a t-test.</span>
+            <span class="gloss-term">Standard deviation (std)</span>
+            <span class="gloss-def">The square root of the variance — a more intuitive measure of spread, in the same units as the data. About 68% of values in a normal distribution fall within one standard deviation of the mean.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">IQR (interquartile range)</span>
+            <span class="gloss-def">The range of the middle 50% of values — from the 25th to the 75th percentile. Shown as the height of the box in a box plot. A wide box means high spread in the middle of the data.</span>
           </div>
           <div class="gloss-item" style="border:none;padding:0">
             <span class="gloss-term">Distribution</span>
             <span class="gloss-def">The shape of your data — how values are spread across the range. The KDE curve (smooth line) in the left panel of the plot shows your data's distribution. A symmetric bell shape is normal.</span>
           </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Outlier</span>
+            <span class="gloss-def">A value far from the rest of the data. Shown as individual dots beyond the whiskers in a box plot. Outliers can distort means and inflate variance — one reason to check normality before running a t-test.</span>
+          </div>
+        </div>
+
+        <!-- Errors -->
+        <p class="gloss-subcat">Errors</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
           <div class="gloss-item" style="border:none;padding:0">
             <span class="gloss-term">False positive (Type I error)</span>
             <span class="gloss-def">Concluding there IS a difference when there actually isn't one. The α threshold (0.05) is exactly the rate of false positives you're willing to accept — 5 in every 100 tests on truly identical groups would appear significant by chance.</span>
@@ -493,6 +507,7 @@
             <span class="gloss-def">Concluding there is NO difference when there actually is one. Usually caused by too little data (low n) or a very small real difference. Increasing sample size reduces this risk.</span>
           </div>
         </div>
+
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
