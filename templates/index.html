@@ -429,6 +429,36 @@
     </button>
     <div id="glossary-body" style="display:none;margin-top:20px">
 
+      <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--gray-200)">
+        <p style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-500);margin-bottom:12px">The Basics</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Hypothesis testing</span>
+            <span class="gloss-def">A method for deciding whether a pattern in your data is real or just random chance. You collect two groups of measurements and ask: are these actually different, or could the gap be noise?</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Null hypothesis</span>
+            <span class="gloss-def">The default assumption that there is <em>no</em> difference between the groups. The test tries to find enough evidence to reject this. If p &lt; α, you reject it — the difference is real.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Statistical significance</span>
+            <span class="gloss-def">A result is "statistically significant" when the p-value falls below your threshold (α). It means the result is unlikely to be a fluke — not that the difference is large or practically important.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Parametric vs non-parametric</span>
+            <span class="gloss-def">Parametric tests (t-tests) assume your data follows a normal distribution. Non-parametric tests (Mann-Whitney) make no such assumption — they work by ranking the data instead.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Normal distribution</span>
+            <span class="gloss-def">The classic bell curve — most values cluster around the middle, fewer at the extremes. Many natural measurements follow this shape. Required for t-tests to be reliable.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Statistical power</span>
+            <span class="gloss-def">The test's ability to detect a real difference when one exists. More data = more power. A test with low power might miss a real effect and incorrectly report no significant difference.</span>
+          </div>
+        </div>
+      </div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
 
         <div>
