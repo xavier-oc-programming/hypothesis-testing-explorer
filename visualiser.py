@@ -70,7 +70,7 @@ def plot_distributions(
 
     plot_data = [g1, g2]
     plot_labels = [group1_name, group2_name]
-    bp = axes[1].boxplot(plot_data, labels=plot_labels, patch_artist=True,
+    bp = axes[1].boxplot(plot_data, tick_labels=plot_labels, patch_artist=True,
                           medianprops=dict(color="white", linewidth=2))
 
     bp["boxes"][0].set_facecolor("#3b82f6")

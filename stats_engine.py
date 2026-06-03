@@ -32,7 +32,7 @@ def check_normality(data: list[float]) -> dict:
         }
 
     stat, p = stats.shapiro(data)
-    is_normal = p >= NORMALITY_THRESHOLD
+    is_normal = bool(p >= NORMALITY_THRESHOLD)
     return {
         "is_normal": is_normal,
         "statistic": float(stat),
@@ -63,7 +63,7 @@ def check_equal_variance(group1: list[float], group2: list[float]) -> dict:
         }
     """
     stat, p = stats.levene(group1, group2)
-    equal_variance = p >= NORMALITY_THRESHOLD
+    equal_variance = bool(p >= NORMALITY_THRESHOLD)
     return {
         "equal_variance": equal_variance,
         "statistic": float(stat),
@@ -106,7 +106,7 @@ def run_independent_ttest(group1: list[float], group2: list[float]) -> dict:
         )
 
     stat, p = stats.ttest_ind(group1, group2, equal_var=True)
-    significant = p < ALPHA
+    significant = bool(p < ALPHA)
     n1, n2 = len(group1), len(group2)
 
     verdict = _build_verdict(significant, p)
@@ -155,7 +155,7 @@ def run_welch_ttest(group1: list[float], group2: list[float]) -> dict:
         )
 
     stat, p = stats.ttest_ind(group1, group2, equal_var=False)
-    significant = p < ALPHA
+    significant = bool(p < ALPHA)
     n1, n2 = len(group1), len(group2)
 
     verdict = _build_verdict(significant, p)
@@ -208,7 +208,7 @@ def run_paired_ttest(group1: list[float], group2: list[float]) -> dict:
         )
 
     stat, p = stats.ttest_rel(group1, group2)
-    significant = p < ALPHA
+    significant = bool(p < ALPHA)
     n = len(group1)
 
     verdict = _build_verdict(significant, p)
@@ -245,7 +245,7 @@ def run_mannwhitney(group1: list[float], group2: list[float]) -> dict:
     Tests whether one distribution is stochastically greater than the other.
     """
     stat, p = stats.mannwhitneyu(group1, group2, alternative="two-sided")
-    significant = p < ALPHA
+    significant = bool(p < ALPHA)
     n1, n2 = len(group1), len(group2)
 
     verdict = _build_verdict(significant, p)
@@ -283,7 +283,7 @@ def run_chisquare(observed: list[int], expected: list[int] = None) -> dict:
     else:
         stat, p = stats.chisquare(observed)
 
-    significant = p < ALPHA
+    significant = bool(p < ALPHA)
     n = sum(observed)
 
     verdict = _build_verdict(significant, p)

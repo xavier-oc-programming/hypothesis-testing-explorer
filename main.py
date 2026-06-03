@@ -85,7 +85,7 @@ class TestRequest(BaseModel):
     group1_name: str = Field("Group 1", description="Label for group 1")
     group2_name: str = Field("Group 2", description="Label for group 2")
     group1: list[float]
-    group2: list[float] = None
+    group2: list[float] | None = None
 
 
 class TestResult(BaseModel):
@@ -97,14 +97,14 @@ class TestResult(BaseModel):
     verdict: str
     interpretation: str
     assumption_checks: dict
-    recommendation: str = None
+    recommendation: str | None = None
     engine: str
     n_group1: int
-    n_group2: int = None
-    plot_url: str = None
-    spark_stats: dict = None
-    total_rows: int = None
-    sampled_for_test: int = None
+    n_group2: int | None = None
+    plot_url: str | None = None
+    spark_stats: dict | None = None
+    total_rows: int | None = None
+    sampled_for_test: int | None = None
 
 
 class HealthResponse(BaseModel):
