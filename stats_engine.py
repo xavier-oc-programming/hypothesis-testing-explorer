@@ -273,18 +273,46 @@ def run_mannwhitney(group1: list[float], group2: list[float]) -> dict:
     }
 
 
-def run_chisquare(observed: list[int], expected: list[int] = None) -> dict:
+def run_chisquare(observed: list, expected: list = None) -> dict:
     """
     Chi-square test (scipy.stats.chisquare or chi2_contingency).
     For independence between categorical variables.
+
+    If two groups of continuous data are provided, auto-bins both into shared
+    bins and uses chi2_contingency to test whether the frequency distributions
+    differ between the groups.
     """
-    if expected is not None:
-        stat, p = stats.chisquare(observed, f_exp=expected)
+    import numpy as np
+
+    # Two continuous groups → bin into shared bins, use chi2_contingency
+    if expected is not None and any(v != int(v) for v in list(observed) + list(expected)):
+        arr1 = np.array(observed, dtype=float)
+        arr2 = np.array(expected, dtype=float)
+        combined = np.concatenate([arr1, arr2])
+        n_bins = min(10, int(np.sqrt(len(combined) / 2)))
+        bin_edges = np.histogram_bin_edges(combined, bins=n_bins)
+        counts1, _ = np.histogram(arr1, bins=bin_edges)
+        counts2, _ = np.histogram(arr2, bins=bin_edges)
+        # Drop bins where both are zero
+        mask = (counts1 + counts2) > 0
+        counts1, counts2 = counts1[mask], counts2[mask]
+        contingency = np.array([counts1, counts2])
+        chi2, p, dof, expected_table = stats.chi2_contingency(contingency)
+        stat, observed = chi2, counts1
+        n = int(arr1.shape[0] + arr2.shape[0])
+    elif expected is not None:
+        # Integer counts provided — normalise expected to observed sum
+        obs_arr = np.array(observed, dtype=float)
+        exp_arr = np.array(expected, dtype=float)
+        exp_arr = exp_arr * (obs_arr.sum() / exp_arr.sum())
+        stat, p = stats.chisquare(obs_arr, f_exp=exp_arr)
+        n = int(obs_arr.sum())
     else:
         stat, p = stats.chisquare(observed)
+        n = int(sum(observed))
 
     significant = bool(p < ALPHA)
-    n = sum(observed)
+    n = n if 'n' in dir() else int(sum(observed))
 
     verdict = _build_verdict(significant, p)
     interpretation = (

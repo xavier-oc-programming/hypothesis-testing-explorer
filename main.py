@@ -279,4 +279,20 @@ async def example_data():
             "group1_name": "Before",
             "group2_name": "After",
         },
+        "response_times": {
+            "group1": np.clip(rng.exponential(scale=200, size=80), 50, 2000).round(1).tolist(),
+            "group2": np.clip(rng.exponential(scale=350, size=80), 50, 2000).round(1).tolist(),
+            "description": "API response times (ms): optimised vs legacy service — skewed, non-normal",
+            "test_name": "mannwhitney",
+            "group1_name": "Optimised",
+            "group2_name": "Legacy",
+        },
+        "survey_ratings": {
+            "group1": (rng.choice([1,2,3,4,5], size=120, p=[0.05,0.10,0.25,0.40,0.20])).tolist(),
+            "group2": (rng.choice([1,2,3,4,5], size=120, p=[0.15,0.25,0.30,0.20,0.10])).tolist(),
+            "description": "Product ratings 1-5: new design vs old design — ordinal/categorical",
+            "test_name": "chisquare",
+            "group1_name": "New design",
+            "group2_name": "Old design",
+        },
     }
