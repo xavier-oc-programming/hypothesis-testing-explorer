@@ -6,7 +6,7 @@ colorTo: purple
 sdk: docker
 app_port: 7860
 pinned: false
-short_description: Upload two CSV columns, run a statistical test, get a plain-English verdict. Auto-routes large datasets through PySpark.
+short_description: Statistical tests with plain-English verdicts + PySpark routing
 ---
 
 # hypothesis-testing-explorer
