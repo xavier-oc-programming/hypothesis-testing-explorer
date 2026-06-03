@@ -294,9 +294,62 @@
 
 <main>
 
+  <!-- What are we testing for -->
+  <div class="card" style="margin-bottom:20px">
+    <button onclick="toggleSection('what-body','what-arrow')" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
+      <h2 style="margin:0;border:none;padding:0">What Are We Testing For?</h2>
+      <span id="what-arrow" style="font-size:18px;color:var(--gray-500)">▼</span>
+    </button>
+    <div id="what-body" style="display:none;margin-top:20px">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div>
+          <p style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">The core question</p>
+          <p style="font-size:14px;color:var(--gray-700);line-height:1.7">Every test in this app answers the same fundamental question: <strong>is the difference I see in my data real, or could it have appeared by random chance even if there is no actual difference?</strong></p>
+          <p style="font-size:14px;color:var(--gray-700);line-height:1.7;margin-top:10px">You have two groups — Group A and Group B. Their averages are different. But data is noisy. Even if you drew both groups from the exact same population, you would expect some difference just from sampling. The test quantifies how surprised we should be by the difference we observed.</p>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">The two possible conclusions</p>
+          <div style="background:var(--green-bg);border:1px solid #86efac;border-radius:8px;padding:14px;margin-bottom:10px">
+            <p style="font-size:13px;font-weight:700;color:var(--green)">Significant result (p &lt; α)</p>
+            <p style="font-size:13px;color:#166534;margin-top:4px;line-height:1.6">The difference is too large to be explained by random chance alone. We reject the idea that the two groups are the same. Something real is going on.</p>
+          </div>
+          <div style="background:var(--red-bg);border:1px solid #fca5a5;border-radius:8px;padding:14px">
+            <p style="font-size:13px;font-weight:700;color:var(--red)">Not significant (p ≥ α)</p>
+            <p style="font-size:13px;color:#991b1b;margin-top:4px;line-height:1.6">The difference could plausibly be due to random variation. We do not have enough evidence to conclude the groups are different. This is <em>not</em> proof they are the same — it just means the data does not make a strong enough case.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--gray-200);padding-top:16px;margin-bottom:16px">
+        <p style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px">What statistical significance actually means</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="background:var(--indigo-bg);border-radius:8px;padding:14px">
+            <p style="font-size:13px;font-weight:700;color:var(--indigo);margin-bottom:6px">What it IS</p>
+            <p style="font-size:13px;color:var(--gray-700);line-height:1.6">Evidence that the difference between the two groups is unlikely to be a fluke. The p-value tells you the probability of seeing a gap this large if there were truly no difference.</p>
+          </div>
+          <div style="background:#fef3c7;border-radius:8px;padding:14px">
+            <p style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">What it is NOT</p>
+            <p style="font-size:13px;color:var(--gray-700);line-height:1.6">Proof that the difference is large, important, or useful. A tiny difference can be statistically significant with enough data. A large difference can be non-significant with too little data.</p>
+          </div>
+          <div style="background:var(--gray-100);border-radius:8px;padding:14px">
+            <p style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:6px">The threshold (α)</p>
+            <p style="font-size:13px;color:var(--gray-700);line-height:1.6">By convention, α = 0.05. This means we accept a 5% chance of incorrectly calling a result significant when there is no real difference. You set this before running the test.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--gray-200);padding-top:16px">
+        <p style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px">A concrete example</p>
+        <p style="font-size:14px;color:var(--gray-700);line-height:1.7">You test two teaching methods on 80 students each. Method A averages 72 and Method B averages 78. The independent t-test returns <strong>p = 0.003</strong>. This means: if both methods were equally effective, you would only see a gap of 6 points or more in 0.3% of experiments just by chance. Since 0.3% is well below 5%, you conclude the difference is real — Method B produces genuinely higher scores. The test does not tell you <em>why</em> B is better, or how much it matters in practice. That is a separate question.</p>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Which test guide -->
   <div class="card" style="margin-bottom:20px">
-    <button onclick="toggleWhichTest()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
+    <button onclick="toggleSection('whichtest-body','whichtest-arrow')" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
       <h2 style="margin:0;border:none;padding:0">Which Test Should I Use?</h2>
       <span id="whichtest-arrow" style="font-size:18px;color:var(--gray-500)">▼</span>
     </button>
@@ -308,43 +361,43 @@
 
         <div class="test-guide-card" style="border-left:4px solid #4338CA">
           <div class="tg-name">Independent t-test</div>
-          <div class="tg-when">Two <strong>separate</strong> groups, continuous data, roughly normal distribution, similar spread</div>
-          <div class="tg-example">e.g. Exam scores of students taught by two different teachers</div>
-          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag">Equal variance</span></div>
+          <div class="tg-when">Use when you have two <strong>completely separate</strong> groups and you want to compare their averages. The data should be continuous (measurements, not categories), roughly bell-curve shaped, and the two groups should have similar spread.</div>
+          <div class="tg-example">e.g. Exam scores of students taught by two different teachers. Heights of men vs women. Page load times before vs after a code change (different sessions).</div>
+          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag">Equal variance</span><span class="tg-tag">Separate groups</span></div>
         </div>
 
         <div class="test-guide-card" style="border-left:4px solid #7c3aed">
           <div class="tg-name">Welch's t-test</div>
-          <div class="tg-when">Two <strong>separate</strong> groups, continuous data, normal distribution, but <strong>unequal spread</strong> between groups</div>
-          <div class="tg-example">e.g. Salaries in two companies where one has much higher variance</div>
-          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag tg-tag-warn">Unequal variance</span></div>
+          <div class="tg-when">Same as the independent t-test — two separate groups, continuous data — but you <strong>do not need to assume the spread is equal</strong>. This is the safer choice when one group is more spread out than the other, and is generally a good default for two-group comparisons.</div>
+          <div class="tg-example">e.g. Salaries at a startup vs a large corporation (startup has much higher variance). Customer spending in two segments where one is far more variable.</div>
+          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag tg-tag-warn">Unequal variance OK</span><span class="tg-tag tg-tag-blue">Safe default</span></div>
         </div>
 
         <div class="test-guide-card" style="border-left:4px solid #0891b2">
           <div class="tg-name">Paired t-test</div>
-          <div class="tg-when"><strong>Same subjects</strong> measured twice — before and after, or two conditions on the same person</div>
-          <div class="tg-example">e.g. Blood pressure of the same patients before and after treatment</div>
-          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag tg-tag-blue">Same subjects</span></div>
+          <div class="tg-when">Use when the <strong>same subjects</strong> appear in both groups — the same person measured twice, the same machine tested under two conditions. Each row in Group 1 is directly linked to the same row in Group 2. Both groups must have the same number of rows.</div>
+          <div class="tg-example">e.g. A patient's blood pressure before and after medication. A runner's time on two different tracks. A student's score before and after tutoring.</div>
+          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag tg-tag-blue">Same subjects</span><span class="tg-tag">Equal n required</span></div>
         </div>
 
         <div class="test-guide-card" style="border-left:4px solid #16a34a">
           <div class="tg-name">Mann-Whitney U</div>
-          <div class="tg-when">Two <strong>separate</strong> groups, but data is <strong>skewed, non-normal, or ordinal</strong> (e.g. ratings, response times)</div>
-          <div class="tg-example">e.g. App response times — often right-skewed with outliers</div>
-          <div class="tg-tags"><span class="tg-tag tg-tag-green">Non-parametric</span><span class="tg-tag tg-tag-warn">Non-normal OK</span><span class="tg-tag">Ordinal OK</span></div>
+          <div class="tg-when">Use when you have two separate groups but the data is <strong>skewed, has outliers, or is ordinal</strong> (e.g. ratings on a 1–5 scale). This test does not assume a normal distribution — it ranks all values and checks if one group tends to rank higher. Less powerful than t-tests when data is normal, but more reliable when it is not.</div>
+          <div class="tg-example">e.g. Response times (usually right-skewed). Customer satisfaction scores (1–10). Income data with high earner outliers.</div>
+          <div class="tg-tags"><span class="tg-tag tg-tag-green">Non-parametric</span><span class="tg-tag tg-tag-warn">Skewed OK</span><span class="tg-tag">Ordinal OK</span><span class="tg-tag">Outliers OK</span></div>
         </div>
 
         <div class="test-guide-card" style="border-left:4px solid #d97706">
           <div class="tg-name">Chi-square</div>
-          <div class="tg-when"><strong>Categorical</strong> data — counts or frequencies per category, not continuous measurements</div>
-          <div class="tg-example">e.g. Number of users who chose each rating (1–5) for two product designs</div>
+          <div class="tg-when">Use when your data is <strong>categorical</strong> — you are counting how many items fall into each category, not measuring a quantity. You are asking whether the pattern of counts differs between two groups, or whether the observed counts match an expected distribution.</div>
+          <div class="tg-example">e.g. Number of users who chose each rating (1–5) for two product designs. Pass/fail rates for two training programmes. Conversion counts for two landing pages.</div>
           <div class="tg-tags"><span class="tg-tag tg-tag-amber">Categorical</span><span class="tg-tag tg-tag-amber">Count data</span><span class="tg-tag tg-tag-green">Non-parametric</span></div>
         </div>
 
         <div class="test-guide-card" style="border-left:4px solid var(--gray-200);background:var(--gray-50)">
-          <div class="tg-name" style="color:var(--gray-700)">Not sure?</div>
-          <div class="tg-when">If your data is continuous and you're unsure about normality — start with <strong>Welch's t-test</strong>. It is robust to unequal variances and works well even when normality is approximately met. The app will flag assumption violations and suggest alternatives.</div>
-          <div class="tg-tags"><span class="tg-tag">Safe default</span></div>
+          <div class="tg-name" style="color:var(--gray-700)">Not sure? Start here.</div>
+          <div class="tg-when">If your data is <strong>continuous measurements</strong> from two separate groups — start with <strong>Welch's t-test</strong>. It handles unequal variances, works well when normality is approximately met, and the app will flag if assumptions are violated and recommend a better test.<br><br>If your data is <strong>ratings, ranks, or counts</strong> — use <strong>Mann-Whitney U</strong> (for two groups of scores) or <strong>Chi-square</strong> (for category counts).</div>
+          <div class="tg-tags"><span class="tg-tag">Safe default: Welch's</span></div>
         </div>
 
       </div>
@@ -503,7 +556,7 @@
 
   <!-- Glossary -->
   <div class="card" style="margin-bottom:32px">
-    <button onclick="toggleGlossary()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
+    <button onclick="toggleSection('glossary-body','glossary-arrow')" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
       <h2 style="margin:0;border:none;padding:0">Statistical Terms — Plain English</h2>
       <span id="glossary-arrow" style="font-size:18px;color:var(--gray-500)">▼</span>
     </button>
@@ -644,9 +697,9 @@
 </main>
 
 <script>
-  function toggleWhichTest() {
-    const body = document.getElementById('whichtest-body');
-    const arrow = document.getElementById('whichtest-arrow');
+  function toggleSection(bodyId, arrowId) {
+    const body = document.getElementById(bodyId);
+    const arrow = document.getElementById(arrowId);
     const open = body.style.display === 'block';
     body.style.display = open ? 'none' : 'block';
     arrow.textContent = open ? '▼' : '▲';
@@ -660,14 +713,6 @@
       + (val <= 0.01 ? 'Very strict: fewer false positives, but easier to miss real effects.'
        : val >= 0.09 ? 'Lenient: catches more effects, but higher risk of false positives.'
        : 'Standard threshold used in most fields.');
-  }
-
-  function toggleGlossary() {
-    const body = document.getElementById('glossary-body');
-    const arrow = document.getElementById('glossary-arrow');
-    const open = body.style.display === 'block';
-    body.style.display = open ? 'none' : 'block';
-    arrow.textContent = open ? '▼' : '▲';
   }
 
   let exampleData = null;
