@@ -1,3 +1,14 @@
+---
+title: Hypothesis Testing Explorer
+emoji: 📊
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_port: 7860
+pinned: false
+short_description: Upload two CSV columns, run a statistical test, get a plain-English verdict. Auto-routes large datasets through PySpark.
+---
+
 # hypothesis-testing-explorer
 
 Upload two CSV columns, select a statistical test, get a plain-English answer. Runs five hypothesis tests (independent t-test, paired t-test, Welch's t-test, Mann-Whitney U, chi-square), checks assumptions automatically, and routes large datasets (50,000+ rows) through PySpark.
