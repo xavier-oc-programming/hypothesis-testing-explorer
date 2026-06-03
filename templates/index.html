@@ -582,6 +582,7 @@
   }
 
   let exampleData = null;
+  let lastExample = null;  // stores the last clicked example so Run Test can re-use it
 
   function switchTab(tab) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -609,6 +610,7 @@
   async function runExample(key) {
     const data = await loadExampleData();
     const ex = data[key];
+    lastExample = ex;
     document.getElementById('test-select').value = ex.test_name;
     document.getElementById('label1').value = ex.group1_name;
     document.getElementById('label2').value = ex.group2_name;
@@ -652,7 +654,10 @@
       finally { setLoading(false); }
 
     } else {
-      showError('Select an example dataset above, or switch to "Upload CSV files".');
+      if (!lastExample) { showError('Click an example dataset above first, then hit Run Test to change the test type.'); return; }
+      const testName = document.getElementById('test-select').value;
+      const alpha = parseFloat(document.getElementById('alpha-range').value);
+      await runTestWithData(lastExample.group1, lastExample.group2, testName, lastExample.group1_name, lastExample.group2_name);
     }
   }
 
