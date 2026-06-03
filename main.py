@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.requests import Request
 from pydantic import BaseModel, Field
 
 from config import PYSPARK_THRESHOLD, ALPHA
@@ -73,9 +71,6 @@ app = FastAPI(
     version="1.0.0",
 )
 
-templates = Jinja2Templates(directory="templates")
-
-
 class TestRequest(BaseModel):
     test_name: str = Field(
         ...,
@@ -115,8 +110,9 @@ class HealthResponse(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def index():
+    with open("templates/index.html") as f:
+        return HTMLResponse(f.read())
 
 
 @app.get("/health", response_model=HealthResponse)
