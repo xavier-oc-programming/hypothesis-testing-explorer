@@ -1,43 +1,16 @@
 title: Hypothesis Testing Explorer — scipy and PySpark
 slug: hypothesis-testing-explorer
 category: data
-date: 2026-05-DD
+date: 2026-06-03
 featured: false
-tags: statistical-analysis, machine-learning, data-analysis, azure, deployment, REST-API, docker, CI-CD, jupyter, web-app, python
-tech_stack: Python, scipy, PySpark, pandas, NumPy, Matplotlib, Seaborn, FastAPI, Uvicorn, Docker, Azure App Service, GitHub Actions, pytest
+tags: statistical-analysis, data-analysis, deployment, REST-API, docker, CI-CD, jupyter, web-app, python
+tech_stack: Python, scipy, PySpark, pandas, NumPy, Matplotlib, Seaborn, FastAPI, Uvicorn, Docker, Hugging Face Spaces, GitHub Actions, pytest
 repo_url: https://github.com/xavier-oc-programming/hypothesis-testing-explorer
-live_url: https://hypothesis-testing-xoc.azurewebsites.net
-demo_url: https://hypothesis-testing-xoc.azurewebsites.net
+live_url: https://xavier-oc-machinelearn-hypothesis-testing-explorer.hf.space
+demo_url: https://xavier-oc-machinelearn-hypothesis-testing-explorer.hf.space
 short_description: Upload two CSV columns, select a test, get a plain-English verdict. Five hypothesis tests with automatic assumption checking. Datasets above 50,000 rows route through PySpark automatically.
-full_description: |
-  An interactive hypothesis testing tool that translates statistical results into plain English.
-  Supports five tests — independent t-test, paired t-test, Welch's t-test, Mann-Whitney U, and
-  chi-square — with automatic assumption checking (Shapiro-Wilk normality, Levene equal variance)
-  and alternative test recommendations when assumptions are violated.
-
-  The routing logic is the distinctive feature: datasets below 50,000 rows use pandas and scipy;
-  above that threshold the computation routes through PySpark (local[*] mode). The statistical
-  question is identical — the computational engine switches automatically based on data scale.
-  PySpark handles data preparation and descriptive statistics; scipy computes the test statistic
-  on a representative sample.
-
-  Served via FastAPI. Accepts CSV file uploads or raw JSON arrays. Generates distribution
-  comparison plots for every test result.
-
-problem: |
-  Building a statistics tool that is useful to non-statisticians — translating p-values and test
-  statistics into actionable plain-English conclusions — while demonstrating PySpark on the same
-  problem to show awareness of scale-appropriate tooling.
-
-solution: |
-  Five scipy tests with assumption checking and plain-English verdict generation. Automatic routing
-  to PySpark at 50,000 rows. Distribution plots via Matplotlib. FastAPI serves CSV uploads and JSON
-  input. Java installed in Dockerfile for PySpark JVM requirement.
-
-challenges: |
-  PySpark requires Java, which adds ~200MB to the Docker image and must be installed at build time
-  via apt-get in the Dockerfile and in the GitHub Actions CI workflow. The PySpark initialisation
-  overhead (~3-5 seconds) makes it slower than pandas for small datasets — the 50,000-row threshold
-  is calibrated to the point where parallelism pays off.
-
+full_description: An interactive hypothesis testing tool that translates statistical results into plain English. Supports five tests — independent t-test, paired t-test, Welch's t-test, Mann-Whitney U, and chi-square — with automatic assumption checking (Shapiro-Wilk normality, Levene equal variance) and alternative test recommendations when assumptions are violated.\n\nThe routing logic is the distinctive feature: datasets below 50,000 rows use pandas and scipy; above that threshold the computation routes through PySpark (local[*] mode). The statistical question is identical — the computational engine switches automatically based on data scale. PySpark handles data preparation and descriptive statistics; scipy computes the test statistic on a representative sample.\n\nServed via FastAPI. Accepts CSV file uploads or raw JSON arrays. Generates distribution comparison plots for every test result. Deployed on Hugging Face Spaces via Docker.
+problem: Building a statistics tool that is useful to non-statisticians — translating p-values and test statistics into actionable plain-English conclusions — while demonstrating PySpark on the same problem to show awareness of scale-appropriate tooling.
+solution: Five scipy tests with assumption checking and plain-English verdict generation. Automatic routing to PySpark at 50,000 rows. Distribution plots via Matplotlib. FastAPI serves CSV uploads and JSON input. Java installed in Dockerfile for PySpark JVM requirement. Deployed on Hugging Face Spaces via Docker.
+challenges: PySpark requires Java, which adds ~200MB to the Docker image and must be installed at build time via apt-get in the Dockerfile and in the GitHub Actions CI workflow. The PySpark initialisation overhead (~3-5 seconds) makes it slower than pandas for small datasets — the 50,000-row threshold is calibrated to the point where parallelism pays off.
 results: TBD — populate after testing. Include example verdicts on the three built-in example datasets.

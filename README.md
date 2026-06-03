@@ -13,9 +13,9 @@ short_description: Hypothesis tests with plain-English verdicts + PySpark
 
 Upload two CSV columns, select a statistical test, get a plain-English answer. Runs five hypothesis tests (independent t-test, paired t-test, Welch's t-test, Mann-Whitney U, chi-square), checks assumptions automatically, and routes large datasets (50,000+ rows) through PySpark.
 
-**Live demo → [hypothesis-testing-xoc.azurewebsites.net](https://hypothesis-testing-xoc.azurewebsites.net)**
+**Live demo → [hypothesis-testing-explorer.hf.space](https://xavier-oc-machinelearn-hypothesis-testing-explorer.hf.space)**
 &nbsp;&nbsp;·&nbsp;&nbsp;
-**API docs → [/docs](https://hypothesis-testing-xoc.azurewebsites.net/docs)**
+**API docs → [/docs](https://xavier-oc-machinelearn-hypothesis-testing-explorer.hf.space/docs)**
 &nbsp;&nbsp;·&nbsp;&nbsp;
 **Notebook → [notebook.ipynb](notebook.ipynb)**
 
@@ -23,7 +23,7 @@ Upload two CSV columns, select a statistical test, get a plain-English answer. R
 ![scipy](https://img.shields.io/badge/scipy-1.11+-green)
 ![PySpark](https://img.shields.io/badge/PySpark-3.5+-orange)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-teal)
-![Azure App Service](https://img.shields.io/badge/Azure-App_Service-0078D4)
+![Hugging Face Spaces](https://img.shields.io/badge/Hugging%20Face-Spaces-FFD21E)
 
 ---
 
@@ -147,27 +147,21 @@ Returns API status, PySpark availability, routing threshold, and supported test 
 
 **Full interactive docs:** `/docs` (Swagger UI) · `/redoc` (ReDoc)
 
-## Deployment — Azure App Service
+## Deployment — Hugging Face Spaces (Docker)
+
+Deployed at: **[xavier-oc-machinelearn-hypothesis-testing-explorer.hf.space](https://xavier-oc-machinelearn-hypothesis-testing-explorer.hf.space)**
+
+Hugging Face Spaces supports Docker natively and is free. PySpark works because the `Dockerfile` installs OpenJDK via `apt-get` at build time.
 
 ```bash
-# Package (exclude dev/runtime artifacts)
-zip -r deploy.zip . \
-  -x "*.git*" -x "venv/*" -x "__pycache__/*" \
-  -x "*.ipynb_checkpoints*" -x "uploads/*" -x "plots/*"
-
-az webapp deployment source config-zip \
-  --name hypothesis-testing-xoc \
-  --resource-group hypothesis-testing-rg \
-  --src deploy.zip
+# Add HF Space as a remote and push
+git remote add hf https://huggingface.co/spaces/xavier-oc-machinelearn/hypothesis-testing-explorer
+git push hf main
 ```
 
-**Java requirement:** PySpark requires the JVM. For Azure deployment without Docker, ensure the app service plan supports custom build steps or use the Dockerfile-based deployment path. The `Dockerfile` installs `default-jdk` via `apt-get`.
+HF rebuilds the Docker image automatically on every push. Build logs are available in the Space's **Logs** tab. The app listens on port **7860** (HF Spaces default).
 
-Startup command (set in Azure App Service configuration):
-
-```
-gunicorn main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --timeout 600
-```
+**Java requirement:** PySpark requires the JVM. The `Dockerfile` installs `default-jdk` via `apt-get` — this is handled at image build time, not at runtime.
 
 ## CI/CD
 
