@@ -456,6 +456,42 @@
             <span class="gloss-term">Statistical power</span>
             <span class="gloss-def">The test's ability to detect a real difference when one exists. More data = more power. A test with low power might miss a real effect and incorrectly report no significant difference.</span>
           </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Mean</span>
+            <span class="gloss-def">The average. Add all values and divide by how many there are. The t-tests in this app compare the means of two groups.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Variance</span>
+            <span class="gloss-def">How spread out the values are around the mean. High variance = values are scattered widely. Low variance = values cluster tightly. Two groups can have the same mean but very different variances.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Standard deviation (std)</span>
+            <span class="gloss-def">The square root of the variance — a more intuitive measure of spread, in the same units as the data. About 68% of values in a normal distribution fall within one standard deviation of the mean.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Median</span>
+            <span class="gloss-def">The middle value when all values are sorted. Unlike the mean, it is not pulled by extreme outliers. The box in a box plot shows the median as a line in the middle.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">IQR (interquartile range)</span>
+            <span class="gloss-def">The range of the middle 50% of values — from the 25th to the 75th percentile. Shown as the height of the box in a box plot. A wide box means high spread in the middle of the data.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Outlier</span>
+            <span class="gloss-def">A value far from the rest of the data. Shown as individual dots beyond the whiskers in a box plot. Outliers can distort means and inflate variance — one reason to check normality before running a t-test.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">Distribution</span>
+            <span class="gloss-def">The shape of your data — how values are spread across the range. The KDE curve (smooth line) in the left panel of the plot shows your data's distribution. A symmetric bell shape is normal.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">False positive (Type I error)</span>
+            <span class="gloss-def">Concluding there IS a difference when there actually isn't one. The α threshold (0.05) is exactly the rate of false positives you're willing to accept — 5 in every 100 tests on truly identical groups would appear significant by chance.</span>
+          </div>
+          <div class="gloss-item" style="border:none;padding:0">
+            <span class="gloss-term">False negative (Type II error)</span>
+            <span class="gloss-def">Concluding there is NO difference when there actually is one. Usually caused by too little data (low n) or a very small real difference. Increasing sample size reduces this risk.</span>
+          </div>
         </div>
       </div>
 
