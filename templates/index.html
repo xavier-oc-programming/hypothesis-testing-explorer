@@ -257,6 +257,17 @@
 
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
+    .test-guide-card { background: white; border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; }
+    .tg-name { font-size: 15px; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+    .tg-when { font-size: 13px; color: var(--gray-700); margin-bottom: 6px; line-height: 1.5; }
+    .tg-example { font-size: 12px; color: var(--gray-500); font-style: italic; margin-bottom: 8px; }
+    .tg-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tg-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: var(--gray-100); color: var(--gray-700); }
+    .tg-tag-warn { background: var(--amber-bg); color: #78350f; }
+    .tg-tag-blue { background: #dbeafe; color: #1d4ed8; }
+    .tg-tag-green { background: var(--green-bg); color: #14532d; }
+    .tg-tag-amber { background: var(--amber-bg); color: #78350f; }
+
     .gloss-subcat { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--indigo); margin-bottom: 12px; padding: 4px 10px; background: var(--indigo-bg); border-radius: 4px; display: inline-block; }
     .gloss-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
     .gloss-item:last-child { border-bottom: none; }
@@ -282,6 +293,63 @@
 </header>
 
 <main>
+
+  <!-- Which test guide -->
+  <div class="card" style="margin-bottom:20px">
+    <button onclick="toggleWhichTest()" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:none;cursor:pointer;padding:0">
+      <h2 style="margin:0;border:none;padding:0">Which Test Should I Use?</h2>
+      <span id="whichtest-arrow" style="font-size:18px;color:var(--gray-500)">▼</span>
+    </button>
+    <div id="whichtest-body" style="display:none;margin-top:20px">
+
+      <p style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Start with your data type, then narrow down by study design and distribution.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+        <div class="test-guide-card" style="border-left:4px solid #4338CA">
+          <div class="tg-name">Independent t-test</div>
+          <div class="tg-when">Two <strong>separate</strong> groups, continuous data, roughly normal distribution, similar spread</div>
+          <div class="tg-example">e.g. Exam scores of students taught by two different teachers</div>
+          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag">Equal variance</span></div>
+        </div>
+
+        <div class="test-guide-card" style="border-left:4px solid #7c3aed">
+          <div class="tg-name">Welch's t-test</div>
+          <div class="tg-when">Two <strong>separate</strong> groups, continuous data, normal distribution, but <strong>unequal spread</strong> between groups</div>
+          <div class="tg-example">e.g. Salaries in two companies where one has much higher variance</div>
+          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag tg-tag-warn">Unequal variance</span></div>
+        </div>
+
+        <div class="test-guide-card" style="border-left:4px solid #0891b2">
+          <div class="tg-name">Paired t-test</div>
+          <div class="tg-when"><strong>Same subjects</strong> measured twice — before and after, or two conditions on the same person</div>
+          <div class="tg-example">e.g. Blood pressure of the same patients before and after treatment</div>
+          <div class="tg-tags"><span class="tg-tag">Continuous</span><span class="tg-tag">Normal</span><span class="tg-tag tg-tag-blue">Same subjects</span></div>
+        </div>
+
+        <div class="test-guide-card" style="border-left:4px solid #16a34a">
+          <div class="tg-name">Mann-Whitney U</div>
+          <div class="tg-when">Two <strong>separate</strong> groups, but data is <strong>skewed, non-normal, or ordinal</strong> (e.g. ratings, response times)</div>
+          <div class="tg-example">e.g. App response times — often right-skewed with outliers</div>
+          <div class="tg-tags"><span class="tg-tag tg-tag-green">Non-parametric</span><span class="tg-tag tg-tag-warn">Non-normal OK</span><span class="tg-tag">Ordinal OK</span></div>
+        </div>
+
+        <div class="test-guide-card" style="border-left:4px solid #d97706">
+          <div class="tg-name">Chi-square</div>
+          <div class="tg-when"><strong>Categorical</strong> data — counts or frequencies per category, not continuous measurements</div>
+          <div class="tg-example">e.g. Number of users who chose each rating (1–5) for two product designs</div>
+          <div class="tg-tags"><span class="tg-tag tg-tag-amber">Categorical</span><span class="tg-tag tg-tag-amber">Count data</span><span class="tg-tag tg-tag-green">Non-parametric</span></div>
+        </div>
+
+        <div class="test-guide-card" style="border-left:4px solid var(--gray-200);background:var(--gray-50)">
+          <div class="tg-name" style="color:var(--gray-700)">Not sure?</div>
+          <div class="tg-when">If your data is continuous and you're unsure about normality — start with <strong>Welch's t-test</strong>. It is robust to unequal variances and works well even when normality is approximately met. The app will flag assumption violations and suggest alternatives.</div>
+          <div class="tg-tags"><span class="tg-tag">Safe default</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
   <!-- Input card -->
   <div class="card">
@@ -576,6 +644,14 @@
 </main>
 
 <script>
+  function toggleWhichTest() {
+    const body = document.getElementById('whichtest-body');
+    const arrow = document.getElementById('whichtest-arrow');
+    const open = body.style.display === 'block';
+    body.style.display = open ? 'none' : 'block';
+    arrow.textContent = open ? '▼' : '▲';
+  }
+
   function updateAlphaLabel(val) {
     document.getElementById('alpha-display').textContent = val.toFixed(2);
     const pct = Math.round(val * 100);
