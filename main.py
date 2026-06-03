@@ -189,7 +189,7 @@ async def test_upload(
             col2=col2,
         )
     else:
-        result = stats_engine.run_test(test_name, group1, group2)
+        result = stats_engine.run_test(test_name, group1, group2, alpha=alpha)
 
     plot_filename = f"{uid}_plot.png"
     plot_path = PLOTS_DIR / plot_filename
@@ -215,7 +215,7 @@ async def test_text(body: TestRequest):
         )
 
     try:
-        result = stats_engine.run_test(body.test_name, body.group1, body.group2)
+        result = stats_engine.run_test(body.test_name, body.group1, body.group2, alpha=body.alpha)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -3,19 +3,6 @@ from config import ALPHA, NORMALITY_THRESHOLD, LARGE_SAMPLE_NORMALITY
 
 
 def check_normality(data: list[float]) -> dict:
-    """
-    Test normality using Shapiro-Wilk (n <= LARGE_SAMPLE_NORMALITY)
-    or skip with a warning for larger samples.
-
-    Returns:
-        {
-          "is_normal": bool,
-          "statistic": float,
-          "p_value": float,
-          "test_used": "shapiro-wilk" or "skipped_large_sample",
-          "interpretation": str
-        }
-    """
     n = len(data)
     if n > LARGE_SAMPLE_NORMALITY:
         return {
@@ -51,17 +38,6 @@ def check_normality(data: list[float]) -> dict:
 
 
 def check_equal_variance(group1: list[float], group2: list[float]) -> dict:
-    """
-    Test equal variance using Levene's test.
-
-    Returns:
-        {
-          "equal_variance": bool,
-          "statistic": float,
-          "p_value": float,
-          "interpretation": str
-        }
-    """
     stat, p = stats.levene(group1, group2)
     equal_variance = bool(p >= NORMALITY_THRESHOLD)
     return {
@@ -80,15 +56,7 @@ def check_equal_variance(group1: list[float], group2: list[float]) -> dict:
     }
 
 
-def run_independent_ttest(group1: list[float], group2: list[float]) -> dict:
-    """
-    Independent samples t-test (scipy.stats.ttest_ind).
-    Assumes equal variances and normality.
-    Checks assumptions first — recommends Welch's if variance unequal,
-    Mann-Whitney if non-normal.
-
-    Returns full result dict (see run_test() return format).
-    """
+def run_independent_ttest(group1: list[float], group2: list[float], alpha: float = ALPHA) -> dict:
     norm1 = check_normality(group1)
     norm2 = check_normality(group2)
     var_check = check_equal_variance(group1, group2)
@@ -106,25 +74,22 @@ def run_independent_ttest(group1: list[float], group2: list[float]) -> dict:
         )
 
     stat, p = stats.ttest_ind(group1, group2, equal_var=True)
-    significant = bool(p < ALPHA)
+    significant = bool(p < alpha)
     n1, n2 = len(group1), len(group2)
-
-    verdict = _build_verdict(significant, p)
-    interpretation = (
-        f"The independent t-test compares the average values of two separate groups. "
-        f"A significant result means the difference between the averages is unlikely "
-        f"to be due to random chance alone. With {n1} and {n2} observations, the test "
-        f"had sufficient data to detect a meaningful difference if one exists."
-    )
 
     return {
         "test_name": "independent_ttest",
         "statistic": float(stat),
         "p_value": float(p),
         "significant": significant,
-        "alpha": ALPHA,
-        "verdict": verdict,
-        "interpretation": interpretation,
+        "alpha": alpha,
+        "verdict": _build_verdict(significant, p, alpha),
+        "interpretation": (
+            f"The independent t-test compares the average values of two separate groups. "
+            f"A significant result means the difference between the averages is unlikely "
+            f"to be due to random chance alone. With {n1} and {n2} observations, the test "
+            f"had sufficient data to detect a meaningful difference if one exists."
+        ),
         "assumption_checks": {
             "normality_group1": norm1,
             "normality_group2": norm2,
@@ -137,12 +102,7 @@ def run_independent_ttest(group1: list[float], group2: list[float]) -> dict:
     }
 
 
-def run_welch_ttest(group1: list[float], group2: list[float]) -> dict:
-    """
-    Welch's t-test (scipy.stats.ttest_ind with equal_var=False).
-    Does not assume equal variances. Preferred over Student's t-test
-    when variances differ.
-    """
+def run_welch_ttest(group1: list[float], group2: list[float], alpha: float = ALPHA) -> dict:
     norm1 = check_normality(group1)
     norm2 = check_normality(group2)
     var_check = check_equal_variance(group1, group2)
@@ -155,25 +115,22 @@ def run_welch_ttest(group1: list[float], group2: list[float]) -> dict:
         )
 
     stat, p = stats.ttest_ind(group1, group2, equal_var=False)
-    significant = bool(p < ALPHA)
+    significant = bool(p < alpha)
     n1, n2 = len(group1), len(group2)
-
-    verdict = _build_verdict(significant, p)
-    interpretation = (
-        f"Welch's t-test compares the means of two groups without assuming equal variances. "
-        f"It is the safer choice when the spread of data differs between groups. "
-        f"With {n1} and {n2} observations, the test examined whether the observed mean "
-        f"difference is larger than what would be expected from random variation alone."
-    )
 
     return {
         "test_name": "welch_ttest",
         "statistic": float(stat),
         "p_value": float(p),
         "significant": significant,
-        "alpha": ALPHA,
-        "verdict": verdict,
-        "interpretation": interpretation,
+        "alpha": alpha,
+        "verdict": _build_verdict(significant, p, alpha),
+        "interpretation": (
+            f"Welch's t-test compares the means of two groups without assuming equal variances. "
+            f"It is the safer choice when the spread of data differs between groups. "
+            f"With {n1} and {n2} observations, the test examined whether the observed mean "
+            f"difference is larger than what would be expected from random variation alone."
+        ),
         "assumption_checks": {
             "normality_group1": norm1,
             "normality_group2": norm2,
@@ -186,11 +143,7 @@ def run_welch_ttest(group1: list[float], group2: list[float]) -> dict:
     }
 
 
-def run_paired_ttest(group1: list[float], group2: list[float]) -> dict:
-    """
-    Paired samples t-test (scipy.stats.ttest_rel).
-    Requires equal-length arrays — the same subjects measured twice.
-    """
+def run_paired_ttest(group1: list[float], group2: list[float], alpha: float = ALPHA) -> dict:
     if len(group1) != len(group2):
         raise ValueError(
             f"Paired t-test requires equal-length groups. "
@@ -208,29 +161,24 @@ def run_paired_ttest(group1: list[float], group2: list[float]) -> dict:
         )
 
     stat, p = stats.ttest_rel(group1, group2)
-    significant = bool(p < ALPHA)
+    significant = bool(p < alpha)
     n = len(group1)
-
-    verdict = _build_verdict(significant, p)
-    interpretation = (
-        f"The paired t-test compares two measurements from the same subjects — "
-        f"for example, before and after a treatment. By comparing each pair directly, "
-        f"it removes individual variation and focuses on the change. "
-        f"With {n} paired observations, the test assessed whether the average change "
-        f"is distinguishable from zero."
-    )
 
     return {
         "test_name": "paired_ttest",
         "statistic": float(stat),
         "p_value": float(p),
         "significant": significant,
-        "alpha": ALPHA,
-        "verdict": verdict,
-        "interpretation": interpretation,
-        "assumption_checks": {
-            "normality_of_differences": norm_diff,
-        },
+        "alpha": alpha,
+        "verdict": _build_verdict(significant, p, alpha),
+        "interpretation": (
+            f"The paired t-test compares two measurements from the same subjects — "
+            f"for example, before and after a treatment. By comparing each pair directly, "
+            f"it removes individual variation and focuses on the change. "
+            f"With {n} paired observations, the test assessed whether the average change "
+            f"is distinguishable from zero."
+        ),
+        "assumption_checks": {"normality_of_differences": norm_diff},
         "recommendation": recommendation,
         "engine": "pandas/scipy",
         "n_group1": n,
@@ -238,33 +186,25 @@ def run_paired_ttest(group1: list[float], group2: list[float]) -> dict:
     }
 
 
-def run_mannwhitney(group1: list[float], group2: list[float]) -> dict:
-    """
-    Mann-Whitney U test (scipy.stats.mannwhitneyu).
-    Non-parametric — does not assume normality.
-    Tests whether one distribution is stochastically greater than the other.
-    """
+def run_mannwhitney(group1: list[float], group2: list[float], alpha: float = ALPHA) -> dict:
     stat, p = stats.mannwhitneyu(group1, group2, alternative="two-sided")
-    significant = bool(p < ALPHA)
+    significant = bool(p < alpha)
     n1, n2 = len(group1), len(group2)
-
-    verdict = _build_verdict(significant, p)
-    interpretation = (
-        f"The Mann-Whitney U test is a non-parametric test that compares two groups "
-        f"without assuming the data follows a normal distribution. It works by ranking "
-        f"all values together and checking whether one group tends to have higher ranks "
-        f"than the other. With {n1} and {n2} observations, a significant result means "
-        f"the two groups come from different distributions."
-    )
 
     return {
         "test_name": "mannwhitney",
         "statistic": float(stat),
         "p_value": float(p),
         "significant": significant,
-        "alpha": ALPHA,
-        "verdict": verdict,
-        "interpretation": interpretation,
+        "alpha": alpha,
+        "verdict": _build_verdict(significant, p, alpha),
+        "interpretation": (
+            f"The Mann-Whitney U test is a non-parametric test that compares two groups "
+            f"without assuming the data follows a normal distribution. It works by ranking "
+            f"all values together and checking whether one group tends to have higher ranks "
+            f"than the other. With {n1} and {n2} observations, a significant result means "
+            f"the two groups come from different distributions."
+        ),
         "assumption_checks": {},
         "recommendation": None,
         "engine": "pandas/scipy",
@@ -273,7 +213,7 @@ def run_mannwhitney(group1: list[float], group2: list[float]) -> dict:
     }
 
 
-def run_chisquare(observed: list, expected: list = None) -> dict:
+def run_chisquare(observed: list, expected: list = None, alpha: float = ALPHA) -> dict:
     """
     Chi-square test (scipy.stats.chisquare or chi2_contingency).
     For independence between categorical variables.
@@ -284,7 +224,6 @@ def run_chisquare(observed: list, expected: list = None) -> dict:
     """
     import numpy as np
 
-    # Two continuous groups → bin into shared bins, use chi2_contingency
     if expected is not None and any(v != int(v) for v in list(observed) + list(expected)):
         arr1 = np.array(observed, dtype=float)
         arr2 = np.array(expected, dtype=float)
@@ -293,15 +232,12 @@ def run_chisquare(observed: list, expected: list = None) -> dict:
         bin_edges = np.histogram_bin_edges(combined, bins=n_bins)
         counts1, _ = np.histogram(arr1, bins=bin_edges)
         counts2, _ = np.histogram(arr2, bins=bin_edges)
-        # Drop bins where both are zero
         mask = (counts1 + counts2) > 0
         counts1, counts2 = counts1[mask], counts2[mask]
-        contingency = np.array([counts1, counts2])
-        chi2, p, dof, expected_table = stats.chi2_contingency(contingency)
-        stat, observed = chi2, counts1
+        chi2, p, dof, _ = stats.chi2_contingency(np.array([counts1, counts2]))
+        stat = chi2
         n = int(arr1.shape[0] + arr2.shape[0])
     elif expected is not None:
-        # Integer counts provided — normalise expected to observed sum
         obs_arr = np.array(observed, dtype=float)
         exp_arr = np.array(expected, dtype=float)
         exp_arr = exp_arr * (obs_arr.sum() / exp_arr.sum())
@@ -311,29 +247,25 @@ def run_chisquare(observed: list, expected: list = None) -> dict:
         stat, p = stats.chisquare(observed)
         n = int(sum(observed))
 
-    significant = bool(p < ALPHA)
-    n = n if 'n' in dir() else int(sum(observed))
-
-    verdict = _build_verdict(significant, p)
-    interpretation = (
-        f"The chi-square test checks whether the observed frequencies differ "
-        f"significantly from what we would expect if there were no relationship "
-        f"between the variables. With {n} total observations, "
-        + (
-            "the observed pattern is unlikely to have occurred by chance alone."
-            if significant
-            else "the observed pattern is consistent with random variation."
-        )
-    )
+    significant = bool(p < alpha)
 
     return {
         "test_name": "chisquare",
         "statistic": float(stat),
         "p_value": float(p),
         "significant": significant,
-        "alpha": ALPHA,
-        "verdict": verdict,
-        "interpretation": interpretation,
+        "alpha": alpha,
+        "verdict": _build_verdict(significant, p, alpha),
+        "interpretation": (
+            f"The chi-square test checks whether the observed frequencies differ "
+            f"significantly from what we would expect if there were no relationship "
+            f"between the variables. With {n} total observations, "
+            + (
+                "the observed pattern is unlikely to have occurred by chance alone."
+                if significant
+                else "the observed pattern is consistent with random variation."
+            )
+        ),
         "assumption_checks": {},
         "recommendation": None,
         "engine": "pandas/scipy",
@@ -346,41 +278,14 @@ def run_test(
     test_name: str,
     group1: list[float],
     group2: list[float] = None,
+    alpha: float = ALPHA,
 ) -> dict:
     """
     Dispatcher — routes to the correct test function.
-
-    Returns standard result format:
-        {
-          "test_name": str,
-          "statistic": float,
-          "p_value": float,
-          "significant": bool,
-          "alpha": float,
-          "verdict": str,
-          "interpretation": str,
-          "assumption_checks": dict,
-          "recommendation": str or None,
-          "engine": "pandas/scipy",
-          "n_group1": int,
-          "n_group2": int or None
-        }
-
-    verdict format:
-    If significant:
-      "There IS a statistically significant difference between the two groups
-       (p = {p_value:.4f}, which is below the significance threshold of {ALPHA})."
-    If not significant:
-      "There IS NOT a statistically significant difference between the two groups
-       (p = {p_value:.4f}, which is above the significance threshold of {ALPHA})."
+    alpha is passed through to all test functions so the user-selected
+    significance level takes effect.
     """
-    supported = {
-        "independent_ttest",
-        "paired_ttest",
-        "welch_ttest",
-        "mannwhitney",
-        "chisquare",
-    }
+    supported = {"independent_ttest", "paired_ttest", "welch_ttest", "mannwhitney", "chisquare"}
     if test_name not in supported:
         raise ValueError(
             f"Unsupported test '{test_name}'. "
@@ -388,15 +293,15 @@ def run_test(
         )
 
     if test_name == "independent_ttest":
-        return run_independent_ttest(group1, group2)
+        return run_independent_ttest(group1, group2, alpha)
     elif test_name == "welch_ttest":
-        return run_welch_ttest(group1, group2)
+        return run_welch_ttest(group1, group2, alpha)
     elif test_name == "paired_ttest":
-        return run_paired_ttest(group1, group2)
+        return run_paired_ttest(group1, group2, alpha)
     elif test_name == "mannwhitney":
-        return run_mannwhitney(group1, group2)
+        return run_mannwhitney(group1, group2, alpha)
     elif test_name == "chisquare":
-        return run_chisquare(group1, group2)
+        return run_chisquare(group1, group2, alpha)
 
 
 def _format_p(p_value: float) -> str:
@@ -405,14 +310,14 @@ def _format_p(p_value: float) -> str:
     return f"p = {p_value:.4f}"
 
 
-def _build_verdict(significant: bool, p_value: float) -> str:
+def _build_verdict(significant: bool, p_value: float, alpha: float = ALPHA) -> str:
     p_str = _format_p(p_value)
     if significant:
         return (
             f"There IS a statistically significant difference between the two groups "
-            f"({p_str}, which is below the significance threshold of {ALPHA})."
+            f"({p_str}, which is below the significance threshold of {alpha})."
         )
     return (
         f"There IS NOT a statistically significant difference between the two groups "
-        f"({p_str}, which is above the significance threshold of {ALPHA})."
+        f"({p_str}, which is above the significance threshold of {alpha})."
     )
