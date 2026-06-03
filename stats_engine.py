@@ -371,13 +371,20 @@ def run_test(
         return run_chisquare(group1, group2)
 
 
+def _format_p(p_value: float) -> str:
+    if p_value < 0.0001:
+        return f"p < 0.0001 ({p_value:.2e})"
+    return f"p = {p_value:.4f}"
+
+
 def _build_verdict(significant: bool, p_value: float) -> str:
+    p_str = _format_p(p_value)
     if significant:
         return (
             f"There IS a statistically significant difference between the two groups "
-            f"(p = {p_value:.4f}, which is below the significance threshold of {ALPHA})."
+            f"({p_str}, which is below the significance threshold of {ALPHA})."
         )
     return (
         f"There IS NOT a statistically significant difference between the two groups "
-        f"(p = {p_value:.4f}, which is above the significance threshold of {ALPHA})."
+        f"({p_str}, which is above the significance threshold of {ALPHA})."
     )

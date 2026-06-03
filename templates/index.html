@@ -512,6 +512,11 @@
     finally { setLoading(false); }
   }
 
+  function formatPValue(p) {
+    if (p < 0.0001) return `p < 0.0001 (${p.toExponential(2)})`;
+    return `p = ${p.toFixed(4)}`;
+  }
+
   function renderResults(d, g1name, g2name) {
     // Verdict banner
     const banner = document.getElementById('verdict-banner');
@@ -525,14 +530,14 @@
       verdictEmoji.textContent = '✓';
       verdictText.textContent = 'There IS a statistically significant difference';
       verdictText.className = 'verdict-main sig-text';
-      verdictPval.textContent = `p = ${d.p_value.toFixed(4)}`;
+      verdictPval.textContent = formatPValue(d.p_value);
       verdictPval.className = 'verdict-pval sig-text';
     } else {
       banner.className = 'not-significant';
       verdictEmoji.textContent = '✗';
       verdictText.textContent = 'There IS NOT a statistically significant difference';
       verdictText.className = 'verdict-main not-sig-text';
-      verdictPval.textContent = `p = ${d.p_value.toFixed(4)}`;
+      verdictPval.textContent = formatPValue(d.p_value);
       verdictPval.className = 'verdict-pval not-sig-text';
     }
 
